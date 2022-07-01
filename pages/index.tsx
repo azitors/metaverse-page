@@ -1,5 +1,5 @@
 import type { NextPage } from 'next';
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import Head from 'next/head';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import {
@@ -30,6 +30,7 @@ const Home: NextPage = () => {
   const [roomId, setRoomId] = useState<string>('');
   const [isMute, setIsMute] = useState<boolean>(false);
   const [localStream, setLocalStream] = useState<MediaStream>(null);
+  const [localAudioTrack, setLocalAudioTrack] = useState<MediaStreamTrack>(null);
   const [voiceChatRoom, setVoiceChatRoom] = useState<SfuRoom>(null);
   const [remoteStreams, setRemoteStreams] = useState<RoomStream[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>('');
@@ -40,7 +41,15 @@ const Home: NextPage = () => {
     [network]
   );
 
-  const { unityProvider, sendMessage } = useAzitoUnity();
+  const { unityProvider, sendMessage, addEventListener, removeEventListener } = useAzitoUnity();
+
+  const handleToggleMute = useCallback(() => {
+    console.log('ToggleMute');
+    if (localAudioTrack) {
+      localAudioTrack.enabled = isMute;
+    }
+    setIsMute((currentIsMute) => !currentIsMute);
+  }, []);
 
   useEffect(() => {
     if (peer) {
@@ -80,6 +89,7 @@ const Home: NextPage = () => {
   useEffect(() => {
     setLocalStream(new MediaStream());
     getUserDevices();
+    addEventListener('ToggleMute', handleToggleMute);
   }, []);
 
   const accessPeer = async () => {
@@ -108,6 +118,7 @@ const Home: NextPage = () => {
       console.log('sfu room ERROR:' + error);
     });
     const track = await getLocalAudioTrackFromDeviceId(selectedDeviceId);
+    setLocalAudioTrack(track);
     localStream.addTrack(track);
     track.enabled = !isMute;
   };
@@ -122,6 +133,7 @@ const Home: NextPage = () => {
           <WalletModalProvider>
             <WalletMultiButton />
             <button onClick={accessPeer}>Access Voice Chat</button>
+            <p>Mute: {isMute ? <>On</> : <>Off</>}</p>
             <p>currentUser: {peerId}</p>
             <p>roomId: {roomId}</p>
             <p>
