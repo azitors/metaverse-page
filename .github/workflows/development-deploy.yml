@@ -9,11 +9,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: touch build config
-        env:
-          BUILD_CONFIG: ${{ secrets.STAGING_BUILD_CONFIG }}
-        run: |
-          echo $BUILD_CONFIG > config/production.json
       # CLIENT
       - name: setup node
         uses: actions/setup-node@v1
