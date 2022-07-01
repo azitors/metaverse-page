@@ -32,10 +32,10 @@ jobs:
           SOURCE_DIR: 'out'
 
       - name: invalidate
-          uses: chetan/invalidate-cloudfront-action@master
-          env:
-            DISTRIBUTION: E2HEG6T3WNIKSW
-            PATHS: '/*'
-            AWS_REGION: 'ap-northeast-1'
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        uses: chetan/invalidate-cloudfront-action@master
+        env:
+          DISTRIBUTION: E2HEG6T3WNIKSW
+          PATHS: '/*'
+          AWS_REGION: 'ap-northeast-1'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
