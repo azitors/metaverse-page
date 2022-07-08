@@ -18,13 +18,14 @@ export const VoiceAndVideoStream: FunctionComponent<Props> = ({
     const $audio = audioRef.current;
     if (isNoAudio || $audio === null) return;
     $audio.srcObject !== stream && ($audio.srcObject = stream);
+    $audio.volume = 0.5;
     $audio.paused && $audio.play();
     if (selectedOutputDeviceId) $audio.setSinkId(selectedOutputDeviceId);
   }, [isNoAudio, audioRef, stream]);
 
   return (
     <>
-      <audio className="remote-stream" ref={audioRef} />
+      <audio className="remote-stream" ref={audioRef} data-audio-id={stream.peerId} />
     </>
   );
 };

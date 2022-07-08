@@ -16,9 +16,13 @@
     "@solana/wallet-adapter-react-ui": "^0.9.7",
     "@solana/wallet-adapter-wallets": "^0.16.1",
     "next": "12.1.6",
+    "next-redux-wrapper": "^7.0.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-loading": "^2.0.3",
+    "react-redux": "^8.0.2",
     "react-unity-webgl": "^9.0.3",
+    "redux": "^4.2.0",
     "skyway-js": "^4.4.4"
   },
   "devDependencies": {
