@@ -29,13 +29,12 @@ export const UnityDisplay: FC = () => {
   } = useContext(VoiceAndVideoContext);
 
   const sendUserDevices = (): void => {
-    const data = JSON.stringify(
-      userDevices.map((d) => {
-        return { [d.deviceId]: d.label };
-      })
-    );
-    console.log(data);
-    sendMessage('setDvices', data);
+    const devicesHash = userDevices.map((d) => {
+      return { [d.deviceId]: d.label };
+    });
+    const sendData = JSON.stringify({ devices: devicesHash, selectedDeviceId: selectedDeviceId });
+    console.log(sendData);
+    sendMessage('setDvices', sendData);
   };
 
   useEffect(() => {
@@ -63,13 +62,15 @@ export const UnityDisplay: FC = () => {
   };
 
   const sendUserOutputDevices = (): void => {
-    const data = JSON.stringify(
-      userOutputDevices.map((d) => {
-        return { [d.deviceId]: d.label };
-      })
-    );
-    console.log(data);
-    sendMessage('setOutputDvices', data);
+    const outputDevicesHash = userOutputDevices.map((d) => {
+      return { [d.deviceId]: d.label };
+    });
+    const sendData = JSON.stringify({
+      outputDevices: outputDevicesHash,
+      selectedOutputDeviceId: selectedOutputDeviceId,
+    });
+    console.log(sendData);
+    sendMessage('setOutputDvices', sendData);
   };
 
   useEffect(() => {
