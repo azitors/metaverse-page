@@ -41,7 +41,7 @@ export const UnityDisplay: FC = () => {
     if (isLoaded) {
       sendUserDevices();
     }
-  }, [userDevices]);
+  }, [userDevices, isLoaded]);
 
   useEffect(() => {
     addEventListener('FetchDevices', sendUserDevices);
@@ -84,7 +84,7 @@ export const UnityDisplay: FC = () => {
     if (isLoaded) {
       sendUserOutputDevices;
     }
-  }, [userOutputDevices]);
+  }, [userOutputDevices, isLoaded]);
 
   useEffect(() => {
     addEventListener('SetOutputDeviceId', setSelectedOutputDeviceId);
@@ -122,7 +122,7 @@ export const UnityDisplay: FC = () => {
       console.log(data);
       sendMessage('setUserList', data);
     }
-  }, [userList]);
+  }, [userList, isLoaded]);
 
   useEffect(() => {
     addEventListener('SetUserVolume', handleUserVolume);
