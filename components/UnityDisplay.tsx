@@ -28,6 +28,14 @@ export const UnityDisplay: FC = () => {
     isMute,
   } = useContext(VoiceAndVideoContext);
 
+  useEffect(() => {
+    if (isLoaded && connected) {
+      const sendData = JSON.stringify({ publicKey });
+      console.log(sendData);
+      sendMessage('sendWalletAddress', sendData);
+    }
+  }, [isLoaded, connected, sendMessage, publicKey]);
+
   const sendUserDevices = (): void => {
     const devicesHash = userDevices.map((d) => {
       return { [d.deviceId]: d.label };
