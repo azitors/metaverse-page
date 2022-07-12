@@ -26,6 +26,8 @@ export const UnityDisplay: FC = () => {
     remoteStreams,
     toggleMute,
     isMute,
+    voiceChatRoom,
+    setRoomId,
   } = useContext(VoiceAndVideoContext);
 
   useEffect(() => {
@@ -139,6 +141,17 @@ export const UnityDisplay: FC = () => {
     };
   }, [addEventListener, removeEventListener, handleUserVolume]);
 
+  const changeRoom = (roomId: string) => {
+    setRoomId(roomId);
+  };
+
+  useEffect(() => {
+    addEventListener('SetRoomId', changeRoom);
+    return () => {
+      removeEventListener('SetRoomId', changeRoom);
+    };
+  }, [addEventListener, removeEventListener, changeRoom]);
+
   return (
     <>
       <div>
@@ -166,6 +179,12 @@ export const UnityDisplay: FC = () => {
           ))}
         </select>
         <button onClick={sendUserOutputDevices}>SendUserOutputDevices</button>
+      </div>
+
+      <div>
+        room: {voiceChatRoom?.name}
+        <button onClick={(e) => changeRoom('Overworld')}>Change Overworld</button>
+        <button onClick={(e) => changeRoom('Room1')}>Change Room1</button>
       </div>
 
       <div>

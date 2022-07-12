@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { RoomStream, SfuRoom } from 'skyway-js';
 import { useSkywayPeer } from './useSkywayPeer';
 import { getLocalAudioTrackFromDeviceId } from './libraries';
@@ -26,12 +26,12 @@ export const useVoiceAndVideoChat = () => {
   const [localVideoStream, setLocalVideoStream] = useState<MediaStream>(new MediaStream());
   const [localAudioTrack, setLocalAudioTrack] = useState<MediaStreamTrack>(null);
   const [localVideoTrack, setLocalVideoTrack] = useState<MediaStreamTrack>(null);
+  const [roomId, setRoomId] = useState<string>('Overworld');
   const [voiceChatRoom, setVoiceChatRoom] = useState<SfuRoom>(null);
   const [videoStreamRoom, setVideoStreamRoom] = useState<SfuRoom>(null);
   const [remoteStreams, setRemoteStreams] = useState<RoomStream[]>([]);
   const { userList, setUserList } = useContext(WorldContext);
   const numberOfUserInCurrentArea = userList.length;
-  const roomId = 'main_room';
   const voicePeer = useSkywayPeer('VOICE');
   const numberOfScreenInRemote = remoteStreams.filter(
     (stream) => stream.getVideoTracks().length !== 0
@@ -54,13 +54,14 @@ export const useVoiceAndVideoChat = () => {
   }, [selectedOutputDeviceId]);
 
   useEffect(() => {
-    console.log('join chat');
     if (voicePeer == null || localAudioTrack == null) return;
+    if (voiceChatRoom !== null && voiceChatRoom.name !== roomId) {
+      closeVoiceChatRoom();
+    }
     if (voiceChatRoom === null) {
       joinVoiceChatRoom();
     }
-  }, [voicePeer, localAudioTrack, localVideoTrack]);
-
+  }, [voicePeer, localAudioTrack, voiceChatRoom, roomId]);
   const setLocalStreamFromSelectedDevice = async () => {
     if (localAudioTrack !== null) {
       localStream.removeTrack(localAudioTrack);
@@ -75,7 +76,7 @@ export const useVoiceAndVideoChat = () => {
 
   const joinVoiceChatRoom = () => {
     console.log(`JOIN ROOM: ${roomId}`);
-    const sfuRoom = voicePeer.joinRoom<SfuRoom>(roomId + '_sfu', {
+    const sfuRoom = voicePeer.joinRoom<SfuRoom>(roomId, {
       mode: 'sfu',
       stream: localStream,
       videoReceiveEnabled: true,
@@ -97,6 +98,16 @@ export const useVoiceAndVideoChat = () => {
     });
   };
 
+  const closeVoiceChatRoom = () => {
+    console.log(`CLOSE ROOM: ${voiceChatRoom.name}`);
+    setVoiceChatRoom((room) => {
+      room.close();
+      return null;
+    });
+    setRemoteStreams((_) => []);
+    setUserList((_) => []);
+  };
+
   const toggleMute = () => {
     localAudioTrack.enabled = isMute;
     setIsMute(!isMute);
@@ -114,5 +125,7 @@ export const useVoiceAndVideoChat = () => {
     selectedOutputDeviceId,
     setSelectedDeviceId,
     setSelectedOutputDeviceId,
+    voiceChatRoom,
+    setRoomId,
   };
 };
