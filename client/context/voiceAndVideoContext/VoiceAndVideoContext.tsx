@@ -19,6 +19,7 @@ export type VoiceAndVideoContextValue = {
   setSelectedOutputDeviceId: Dispatch<SetStateAction<string>>;
   voiceChatRoom: SfuRoom;
   setRoomId: Dispatch<SetStateAction<string>>;
+  setUserVolume: (peerId: string, volume: number) => void;
 };
 
 interface Props {

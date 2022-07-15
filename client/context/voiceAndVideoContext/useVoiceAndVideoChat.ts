@@ -113,6 +113,14 @@ export const useVoiceAndVideoChat = () => {
     setIsMute(!isMute);
   };
 
+  const setUserVolume = (peerId: string, volume: number) => {
+    const targetUser = userList.find((u) => u.peerId === peerId);
+    targetUser.volume = volume;
+    setUserList((userList) => [...userList.filter((u) => u.peerId !== peerId), targetUser]);
+    const element: HTMLMediaElement = document.querySelector(`[data-audio-id="${peerId}"]`);
+    element.volume = volume;
+  };
+
   return {
     audioContext,
     haveDeviceAccess,
@@ -127,5 +135,6 @@ export const useVoiceAndVideoChat = () => {
     setSelectedOutputDeviceId,
     voiceChatRoom,
     setRoomId,
+    setUserVolume,
   };
 };
