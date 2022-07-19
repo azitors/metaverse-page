@@ -11,10 +11,17 @@ import { WorldContext } from '../client/context/worldContext/WorldContext';
 import { UserState } from '../shared/types/UserState';
 
 export const UnityDisplay: FC = () => {
-  const { publicKey, sendTransaction, wallet, connected } = useWallet();
-  const { unityProvider, sendMessage, addEventListener, removeEventListener, isLoaded } =
-    useAzitoUnity();
-  const { userList, setUserList } = useContext(WorldContext);
+  const { publicKey, wallet, connected } = useWallet();
+  const {
+    unityProvider,
+    sendToUnity,
+    addEventListener,
+    removeEventListener,
+    isLoaded,
+    sendUserDevices,
+    sendUserOutputDevices,
+  } = useAzitoUnity();
+  const { userList } = useContext(WorldContext);
 
   const {
     userDevices,
@@ -26,110 +33,57 @@ export const UnityDisplay: FC = () => {
     remoteStreams,
     toggleMute,
     isMute,
+    voiceChatRoom,
+    setRoomId,
+    setUserVolume,
   } = useContext(VoiceAndVideoContext);
 
-  const sendUserDevices = (): void => {
-    const devicesHash = userDevices.map((d) => {
-      return { [d.deviceId]: d.label };
-    });
-    const sendData = JSON.stringify({ devices: devicesHash, selectedDeviceId: selectedDeviceId });
-    console.log(sendData);
-    sendMessage('setDvices', sendData);
-  };
+  useEffect(() => {
+    if (isLoaded && connected) {
+      sendToUnity({ type: 'SET_WALLET_ADDRESS', publicKey: publicKey.toString() });
+    }
+  }, [isLoaded, connected, publicKey]);
 
   useEffect(() => {
     if (isLoaded) {
       sendUserDevices();
     }
-  }, [userDevices]);
-
-  useEffect(() => {
-    addEventListener('FetchDevices', sendUserDevices);
-    return () => {
-      removeEventListener('FetchDevices', sendUserDevices);
-    };
-  }, [addEventListener, removeEventListener, sendUserDevices]);
-
-  useEffect(() => {
-    addEventListener('SetDeviceId', setSelectedDeviceId);
-    return () => {
-      removeEventListener('SetDeviceId', setSelectedDeviceId);
-    };
-  }, [addEventListener, removeEventListener, setSelectedDeviceId]);
+  }, [userDevices, isLoaded]);
 
   const handleDeviceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedDeviceId(e.target.value);
   };
 
-  const sendUserOutputDevices = (): void => {
-    const outputDevicesHash = userOutputDevices.map((d) => {
-      return { [d.deviceId]: d.label };
-    });
-    const sendData = JSON.stringify({
-      outputDevices: outputDevicesHash,
-      selectedOutputDeviceId: selectedOutputDeviceId,
-    });
-    console.log(sendData);
-    sendMessage('setOutputDvices', sendData);
-  };
-
-  useEffect(() => {
-    addEventListener('FetchOutputDevices', sendUserOutputDevices);
-    return () => {
-      removeEventListener('FetchOutputDevices', sendUserOutputDevices);
-    };
-  }, [addEventListener, removeEventListener, sendUserOutputDevices]);
-
   useEffect(() => {
     if (isLoaded) {
-      sendUserOutputDevices;
+      sendUserOutputDevices();
     }
-  }, [userOutputDevices]);
-
-  useEffect(() => {
-    addEventListener('SetOutputDeviceId', setSelectedOutputDeviceId);
-    return () => {
-      removeEventListener('SetOutputDeviceId', setSelectedOutputDeviceId);
-    };
-  }, [addEventListener, removeEventListener, setSelectedOutputDeviceId]);
+  }, [userOutputDevices, isLoaded]);
 
   const handleOutputDeviceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOutputDeviceId(e.target.value);
   };
 
-  useEffect(() => {
-    addEventListener('ToggleMute', toggleMute);
-    return () => {
-      removeEventListener('ToggleMute', toggleMute);
-    };
-  }, [addEventListener, removeEventListener, toggleMute]);
-
   const handleClick = () => {
     toggleMute();
   };
 
-  const handleUserVolume = (peerId: string, volume: number) => {
-    const targetUser = userList.find((u) => u.peerId === peerId);
-    targetUser.volume = volume;
-    setUserList((userList) => [...userList.filter((u) => u.peerId !== peerId), targetUser]);
-    const element: HTMLMediaElement = document.querySelector(`[data-audio-id="${peerId}"]`);
-    element.volume = volume;
+  useEffect(() => {
+    if (isLoaded) {
+      sendToUnity({ type: 'SET_USER_LIST', userList });
+    }
+  }, [userList, isLoaded]);
+
+  const changeRoom = (roomId: string) => {
+    setRoomId(roomId);
   };
 
   useEffect(() => {
-    if (isLoaded) {
-      const data = JSON.stringify(userList);
-      console.log(data);
-      sendMessage('setUserList', data);
-    }
-  }, [userList]);
-
-  useEffect(() => {
-    addEventListener('SetUserVolume', handleUserVolume);
+    addEventListener('SetRoomId', changeRoom);
     return () => {
-      removeEventListener('SetUserVolume', handleUserVolume);
+      removeEventListener('SetRoomId', changeRoom);
     };
-  }, [addEventListener, removeEventListener, handleUserVolume]);
+  }, [addEventListener, removeEventListener, changeRoom]);
 
   return (
     <>
@@ -161,6 +115,12 @@ export const UnityDisplay: FC = () => {
       </div>
 
       <div>
+        room: {voiceChatRoom?.name}
+        <button onClick={(e) => changeRoom('Overworld')}>Change Overworld</button>
+        <button onClick={(e) => changeRoom('Room1')}>Change Room1</button>
+      </div>
+
+      <div>
         roomUsers:
         {userList.map((user) => (
           <div key={user.peerId}>
@@ -171,7 +131,7 @@ export const UnityDisplay: FC = () => {
               max="1"
               step="0.1"
               defaultValue={user.volume}
-              onChange={(e) => handleUserVolume(user.peerId, Number(e.target.value))}
+              onChange={(e) => setUserVolume(user.peerId, Number(e.target.value))}
             />
           </div>
         ))}

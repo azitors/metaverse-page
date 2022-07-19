@@ -1,5 +1,5 @@
 import { createContext, Dispatch, FunctionComponent, SetStateAction, useContext } from 'react';
-import { RoomStream } from 'skyway-js';
+import { RoomStream, SfuRoom } from 'skyway-js';
 import { WorldContext } from '../worldContext/WorldContext';
 import { useVoiceAndVideoChat } from './useVoiceAndVideoChat';
 import { useSelector } from 'react-redux';
@@ -17,6 +17,9 @@ export type VoiceAndVideoContextValue = {
   selectedOutputDeviceId: string;
   setSelectedDeviceId: Dispatch<SetStateAction<string>>;
   setSelectedOutputDeviceId: Dispatch<SetStateAction<string>>;
+  voiceChatRoom: SfuRoom;
+  setRoomId: Dispatch<SetStateAction<string>>;
+  setUserVolume: (peerId: string, volume: number) => void;
 };
 
 interface Props {
