@@ -13,7 +13,7 @@ import { LoadingView } from './LoadingView';
 import RootState from '../../store/rootState';
 import { UserState } from '../../../shared/types/UserState';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { UserActions, userSelector } from '../../store/userModule';
 
@@ -50,7 +50,6 @@ export const WorldContextProvider: FunctionComponent<Props> = ({ children }) => 
 
   return (
     <WorldContext.Provider value={contextValue}>
-      <WalletMultiButton />
       <Fragment>{connected ? <div>{children}</div> : <LoadingView />}</Fragment>
     </WorldContext.Provider>
   );
