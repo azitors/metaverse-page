@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { UserActions, userSelector } from '../client/store/userModule';
 import { WorldContext } from '../client/context/worldContext/WorldContext';
 import { UserState } from '../shared/types/UserState';
+import { css } from '@emotion/react';
 
 export const UnityDisplay: FC = () => {
   const { publicKey, wallet, connected } = useWallet();
@@ -87,56 +88,7 @@ export const UnityDisplay: FC = () => {
 
   return (
     <>
-      <div>
-        Mute: {isMute ? <>On</> : <>Off</>}
-        <button onClick={handleClick}>MuteToggle</button>
-      </div>
-
-      <div>
-        <select value={selectedDeviceId} onChange={handleDeviceChange}>
-          {userDevices.map((device) => (
-            <option key={device.deviceId} value={device.deviceId}>
-              {device.label}
-            </option>
-          ))}
-        </select>
-        <button onClick={sendUserDevices}>SendUserDevices</button>
-      </div>
-
-      <div>
-        <select value={selectedOutputDeviceId} onChange={handleOutputDeviceChange}>
-          {userOutputDevices.map((device) => (
-            <option key={device.deviceId} value={device.deviceId}>
-              {device.label}
-            </option>
-          ))}
-        </select>
-        <button onClick={sendUserOutputDevices}>SendUserOutputDevices</button>
-      </div>
-
-      <div>
-        room: {voiceChatRoom?.name}
-        <button onClick={(e) => changeRoom('Overworld')}>Change Overworld</button>
-        <button onClick={(e) => changeRoom('Room1')}>Change Room1</button>
-      </div>
-
-      <div>
-        roomUsers:
-        {userList.map((user) => (
-          <div key={user.peerId}>
-            {user.peerId}
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              defaultValue={user.volume}
-              onChange={(e) => setUserVolume(user.peerId, Number(e.target.value))}
-            />
-          </div>
-        ))}
-      </div>
-      <>{connected && <Unity unityProvider={unityProvider} style={{ width: '100%' }} />}</>
+      <>{connected && <Unity unityProvider={unityProvider} css={unityView} />}</>
 
       {remoteStreams.map((stream) => {
         return (
@@ -150,3 +102,11 @@ export const UnityDisplay: FC = () => {
     </>
   );
 };
+
+const unityView = css`
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+`;
